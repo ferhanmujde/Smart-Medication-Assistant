@@ -13,6 +13,16 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        sans: ['Nunito', 'sans-serif'],
+      },
+      fontSize: {
+        base: ['18px', '1.6'],
+        lg: ['20px', '1.5'],
+        xl: ['22px', '1.4'],
+        '2xl': ['26px', '1.3'],
+        '3xl': ['30px', '1.2'],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -47,6 +57,15 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        "nav-green": "hsl(var(--nav-green))",
+        "nav-blue": "hsl(var(--nav-blue))",
+        "nav-purple": "hsl(var(--nav-purple))",
+        "nav-orange": "hsl(var(--nav-orange))",
+        "risk-safe": "hsl(var(--risk-safe))",
+        "risk-caution": "hsl(var(--risk-caution))",
+        "risk-danger": "hsl(var(--risk-danger))",
+        "chat-user": "hsl(var(--chat-user))",
+        "chat-ai": "hsl(var(--chat-ai))",
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
