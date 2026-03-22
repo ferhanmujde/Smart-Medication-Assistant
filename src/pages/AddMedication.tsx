@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 
 const AddMedication = () => {
   const navigate = useNavigate();
@@ -9,9 +9,20 @@ const AddMedication = () => {
     frequency: 'Günde 1 kez',
     stock: '',
   });
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleChange = (field: string, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => setPhotoPreview(reader.result as string);
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -31,9 +42,35 @@ const AddMedication = () => {
 
       <h1 className="text-2xl font-extrabold mb-4">📷 İlaç Ekle</h1>
 
-      <button className="w-full bg-muted border-2 border-dashed border-border rounded-lg min-h-[80px] text-xl font-bold text-muted-foreground mb-6 active:bg-border transition-colors">
-        📷 Fotoğraf Çek
-      </button>
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        className="hidden"
+        onChange={handlePhotoSelect}
+      />
+
+      {photoPreview ? (
+        <div className="relative mb-6">
+          <img src={photoPreview} alt="İlaç fotoğrafı" className="w-full rounded-lg border shadow-sm max-h-[240px] object-cover" />
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="absolute bottom-2 right-2 bg-primary text-primary-foreground font-bold text-base rounded-lg px-4 py-2 min-h-[44px] active:opacity-80 shadow-md"
+          >
+            📷 Değiştir
+          </button>
+        </div>
+      ) : (
+        <button
+          type="button"
+          onClick={() => fileInputRef.current?.click()}
+          className="w-full bg-muted border-2 border-dashed border-border rounded-lg min-h-[80px] text-xl font-bold text-muted-foreground mb-6 active:bg-border transition-colors"
+        >
+          📷 Fotoğraf Çek
+        </button>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
