@@ -25,6 +25,7 @@ const App = () => (
           <Route path="/medications/:id" element={<MedicationDetail />} />
           <Route path="/add" element={<AddMedication />} />
           <Route path="/assistant" element={<AIAssistant />} />
+          <Route path="/family" element={<FamilyView />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

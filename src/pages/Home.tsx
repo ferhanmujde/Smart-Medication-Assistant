@@ -8,7 +8,7 @@ const Home = () => {
   const navButtons = [
     { label: '📷 İlaç Ekle', path: '/add', color: 'bg-nav-green' },
     { label: '💊 Tüm İlaçlarım', path: '/medications', color: 'bg-nav-blue' },
-    { label: '👨‍👩‍👧 Aile Görünümü', path: '#', color: 'bg-nav-purple' },
+    { label: '👨‍👩‍👧 Aile Görünümü', path: '/family', color: 'bg-nav-purple' },
     { label: '💬 AI Asistanım', path: '/assistant', color: 'bg-nav-orange' },
   ];
 
