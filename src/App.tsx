@@ -8,6 +8,7 @@ import MedicationList from "./pages/MedicationList";
 import MedicationDetail from "./pages/MedicationDetail";
 import AddMedication from "./pages/AddMedication";
 import AIAssistant from "./pages/AIAssistant";
+import FamilyView from "./pages/FamilyView";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
