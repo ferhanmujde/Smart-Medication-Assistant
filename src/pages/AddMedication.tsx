@@ -1,8 +1,10 @@
 import { useNavigate } from 'react-router-dom';
 import { useState, useRef } from 'react';
+import { useToast } from '@/hooks/use-toast';
 
 const AddMedication = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [form, setForm] = useState({
     name: '',
     dose: '',
@@ -10,7 +12,9 @@ const AddMedication = () => {
     stock: '',
   });
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [sending, setSending] = useState(false);
 
   const handleChange = (field: string, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -19,16 +23,53 @@ const AddMedication = () => {
   const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      setPhotoFile(file);
       const reader = new FileReader();
       reader.onloadend = () => setPhotoPreview(reader.result as string);
       reader.readAsDataURL(file);
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    alert('İlaç kaydedildi! (Demo)');
-    navigate('/');
+    setSending(true);
+    try {
+      const formData = new FormData();
+      formData.append('name', form.name);
+      formData.append('dose', form.dose);
+      formData.append('frequency', form.frequency);
+      formData.append('stock', form.stock);
+      if (photoFile) {
+        formData.append('photo', photoFile);
+      }
+
+      const response = await fetch('https://hook.eu1.make.com/cv53gsneecdp9ggkapnyjj8d1fp9wa8j', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (response.ok) {
+        toast({
+          title: '📋 İlaç analiz ediliyor...',
+          description: 'Bilgiler başarıyla gönderildi.',
+        });
+        navigate('/');
+      } else {
+        toast({
+          title: '❌ Gönderim başarısız',
+          description: 'Lütfen tekrar deneyin.',
+          variant: 'destructive',
+        });
+      }
+    } catch {
+      toast({
+        title: '❌ Bağlantı hatası',
+        description: 'İnternet bağlantınızı kontrol edin.',
+        variant: 'destructive',
+      });
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -125,9 +166,10 @@ const AddMedication = () => {
 
         <button
           type="submit"
-          className="w-full bg-primary text-primary-foreground font-bold text-xl rounded-lg min-h-[64px] active:opacity-80 transition-opacity shadow-md mt-4"
+          disabled={sending}
+          className="w-full bg-primary text-primary-foreground font-bold text-xl rounded-lg min-h-[64px] active:opacity-80 transition-opacity shadow-md mt-4 disabled:opacity-50"
         >
-          💾 Kaydet
+          {sending ? '⏳ Gönderiliyor...' : '💾 Kaydet'}
         </button>
       </form>
     </div>
