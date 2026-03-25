@@ -4,6 +4,7 @@ import { useToast } from '@/hooks/use-toast';
 
 const AddMedication = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [form, setForm] = useState({
     name: '',
     dose: '',
@@ -11,7 +12,9 @@ const AddMedication = () => {
     stock: '',
   });
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [sending, setSending] = useState(false);
 
   const handleChange = (field: string, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
