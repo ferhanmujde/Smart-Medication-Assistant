@@ -23,16 +23,53 @@ const AddMedication = () => {
   const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      setPhotoFile(file);
       const reader = new FileReader();
       reader.onloadend = () => setPhotoPreview(reader.result as string);
       reader.readAsDataURL(file);
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    alert('İlaç kaydedildi! (Demo)');
-    navigate('/');
+    setSending(true);
+    try {
+      const formData = new FormData();
+      formData.append('name', form.name);
+      formData.append('dose', form.dose);
+      formData.append('frequency', form.frequency);
+      formData.append('stock', form.stock);
+      if (photoFile) {
+        formData.append('photo', photoFile);
+      }
+
+      const response = await fetch('https://hook.eu1.make.com/cv53gsneecdp9ggkapnyjj8d1fp9wa8j', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (response.ok) {
+        toast({
+          title: '📋 İlaç analiz ediliyor...',
+          description: 'Bilgiler başarıyla gönderildi.',
+        });
+        navigate('/');
+      } else {
+        toast({
+          title: '❌ Gönderim başarısız',
+          description: 'Lütfen tekrar deneyin.',
+          variant: 'destructive',
+        });
+      }
+    } catch {
+      toast({
+        title: '❌ Bağlantı hatası',
+        description: 'İnternet bağlantınızı kontrol edin.',
+        variant: 'destructive',
+      });
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
