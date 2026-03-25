@@ -2,6 +2,8 @@ import { useNavigate } from 'react-router-dom';
 import { useState, useRef } from 'react';
 import { useToast } from '@/hooks/use-toast';
 
+const WEBHOOK_URL = 'https://hook.eu1.make.com/cv53gsneecdp9ggkapnyjj8d1fp9wa8j';
+
 const AddMedication = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -15,9 +17,55 @@ const AddMedication = () => {
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [sending, setSending] = useState(false);
+  const [analyzing, setAnalyzing] = useState(false);
 
   const handleChange = (field: string, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const analyzePhoto = async (file: File) => {
+    setAnalyzing(true);
+    toast({
+      title: '📋 İlaç analiz ediliyor...',
+      description: 'Fotoğraf Gemini ile inceleniyor.',
+    });
+    try {
+      const formData = new FormData();
+      formData.append('photo', file);
+      formData.append('action', 'analyze');
+
+      const response = await fetch(WEBHOOK_URL, {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setForm((prev) => ({
+          ...prev,
+          name: data.name || data.ilac_adi || prev.name,
+          dose: data.dose || data.dozaj || prev.dose,
+        }));
+        toast({
+          title: '✅ Analiz tamamlandı',
+          description: 'İlaç bilgileri otomatik dolduruldu. Kontrol edip kaydedin.',
+        });
+      } else {
+        toast({
+          title: '⚠️ Analiz başarısız',
+          description: 'Bilgileri manuel olarak girebilirsiniz.',
+          variant: 'destructive',
+        });
+      }
+    } catch {
+      toast({
+        title: '❌ Bağlantı hatası',
+        description: 'Analiz yapılamadı. Bilgileri manuel girebilirsiniz.',
+        variant: 'destructive',
+      });
+    } finally {
+      setAnalyzing(false);
+    }
   };
 
   const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -27,6 +75,7 @@ const AddMedication = () => {
       const reader = new FileReader();
       reader.onloadend = () => setPhotoPreview(reader.result as string);
       reader.readAsDataURL(file);
+      analyzePhoto(file);
     }
   };
 
@@ -35,6 +84,7 @@ const AddMedication = () => {
     setSending(true);
     try {
       const formData = new FormData();
+      formData.append('action', 'save');
       formData.append('name', form.name);
       formData.append('dose', form.dose);
       formData.append('frequency', form.frequency);
@@ -43,15 +93,15 @@ const AddMedication = () => {
         formData.append('photo', photoFile);
       }
 
-      const response = await fetch('https://hook.eu1.make.com/cv53gsneecdp9ggkapnyjj8d1fp9wa8j', {
+      const response = await fetch(WEBHOOK_URL, {
         method: 'POST',
         body: formData,
       });
 
       if (response.ok) {
         toast({
-          title: '📋 İlaç analiz ediliyor...',
-          description: 'Bilgiler başarıyla gönderildi.',
+          title: '✅ İlaç kaydedildi',
+          description: 'Airtable\'a başarıyla gönderildi.',
         });
         navigate('/');
       } else {
@@ -95,6 +145,11 @@ const AddMedication = () => {
       {photoPreview ? (
         <div className="relative mb-6">
           <img src={photoPreview} alt="İlaç fotoğrafı" className="w-full rounded-lg border shadow-sm max-h-[240px] object-cover" />
+          {analyzing && (
+            <div className="absolute inset-0 bg-background/70 rounded-lg flex items-center justify-center">
+              <span className="text-lg font-bold animate-pulse">🔍 Analiz ediliyor...</span>
+            </div>
+          )}
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
@@ -120,9 +175,9 @@ const AddMedication = () => {
             type="text"
             value={form.name}
             onChange={(e) => handleChange('name', e.target.value)}
-            placeholder="örn. Beloc"
-            required
-            className="w-full border rounded-lg p-3 text-lg bg-card min-h-[56px] focus:outline-none focus:ring-2 focus:ring-ring"
+            placeholder={analyzing ? 'Analiz ediliyor...' : 'örn. Beloc'}
+            disabled={analyzing}
+            className="w-full border rounded-lg p-3 text-lg bg-card min-h-[56px] focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50"
           />
         </div>
 
@@ -132,9 +187,9 @@ const AddMedication = () => {
             type="text"
             value={form.dose}
             onChange={(e) => handleChange('dose', e.target.value)}
-            placeholder="örn. 50mg"
-            required
-            className="w-full border rounded-lg p-3 text-lg bg-card min-h-[56px] focus:outline-none focus:ring-2 focus:ring-ring"
+            placeholder={analyzing ? 'Analiz ediliyor...' : 'örn. 50mg'}
+            disabled={analyzing}
+            className="w-full border rounded-lg p-3 text-lg bg-card min-h-[56px] focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50"
           />
         </div>
 
@@ -159,14 +214,13 @@ const AddMedication = () => {
             value={form.stock}
             onChange={(e) => handleChange('stock', e.target.value)}
             placeholder="örn. 30"
-            required
             className="w-full border rounded-lg p-3 text-lg bg-card min-h-[56px] focus:outline-none focus:ring-2 focus:ring-ring"
           />
         </div>
 
         <button
           type="submit"
-          disabled={sending}
+          disabled={sending || analyzing}
           className="w-full bg-primary text-primary-foreground font-bold text-xl rounded-lg min-h-[64px] active:opacity-80 transition-opacity shadow-md mt-4 disabled:opacity-50"
         >
           {sending ? '⏳ Gönderiliyor...' : '💾 Kaydet'}
