@@ -166,9 +166,10 @@ const AddMedication = () => {
 
         <button
           type="submit"
-          className="w-full bg-primary text-primary-foreground font-bold text-xl rounded-lg min-h-[64px] active:opacity-80 transition-opacity shadow-md mt-4"
+          disabled={sending}
+          className="w-full bg-primary text-primary-foreground font-bold text-xl rounded-lg min-h-[64px] active:opacity-80 transition-opacity shadow-md mt-4 disabled:opacity-50"
         >
-          💾 Kaydet
+          {sending ? '⏳ Gönderiliyor...' : '💾 Kaydet'}
         </button>
       </form>
     </div>
