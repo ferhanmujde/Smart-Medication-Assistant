@@ -1,8 +1,97 @@
 import { useNavigate } from 'react-router-dom';
-import { useState, useRef } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { Clock } from 'lucide-react';
 
 const WEBHOOK_URL = 'https://hook.eu1.make.com/cv53gsneecdp9ggkapnyjj8d1fp9wa8j';
+
+const HOURS = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0'));
+const MINUTES = ['00', '15', '30', '45'];
+
+const FREQUENCY_MAP: Record<string, number> = {
+  'Günde 1 kez': 1,
+  'Günde 2 kez': 2,
+  'Günde 3 kez': 3,
+  'Haftada 1 kez': 1,
+};
+
+const DEFAULT_TIMES: Record<string, string[]> = {
+  'Günde 1 kez': ['08:00'],
+  'Günde 2 kez': ['08:00', '20:00'],
+  'Günde 3 kez': ['08:00', '14:00', '20:00'],
+  'Haftada 1 kez': ['09:00'],
+};
+
+interface TimePickerProps {
+  value: string;
+  onChange: (val: string) => void;
+  label: string;
+  active: boolean;
+  onFocus: () => void;
+}
+
+const TimePicker = ({ value, onChange, label, active, onFocus }: TimePickerProps) => {
+  const [hour, minute] = value.split(':');
+  const hourRef = useRef<HTMLDivElement>(null);
+  const minuteRef = useRef<HTMLDivElement>(null);
+
+  return (
+    <div
+      onClick={onFocus}
+      className={`flex-1 rounded-xl p-3 transition-all cursor-pointer ${
+        active
+          ? 'ring-2 ring-secondary shadow-lg bg-card'
+          : 'bg-muted shadow-sm'
+      }`}
+    >
+      <p className="text-sm font-bold text-muted-foreground mb-2 text-center">{label}</p>
+      <div className="flex items-center justify-center gap-1">
+        {/* Hour scroller */}
+        <div
+          ref={hourRef}
+          className="h-[120px] overflow-y-auto snap-y snap-mandatory scrollbar-hide rounded-lg bg-background w-16"
+        >
+          {HOURS.map((h) => (
+            <button
+              key={h}
+              type="button"
+              onClick={() => onChange(`${h}:${minute}`)}
+              className={`w-full snap-center flex items-center justify-center h-10 text-2xl font-extrabold transition-colors ${
+                h === hour
+                  ? 'bg-secondary text-secondary-foreground rounded-lg'
+                  : 'text-foreground/60'
+              }`}
+            >
+              {h}
+            </button>
+          ))}
+        </div>
+        <span className="text-3xl font-extrabold text-foreground">:</span>
+        {/* Minute scroller */}
+        <div
+          ref={minuteRef}
+          className="h-[120px] overflow-y-auto snap-y snap-mandatory scrollbar-hide rounded-lg bg-background w-16"
+        >
+          {MINUTES.map((m) => (
+            <button
+              key={m}
+              type="button"
+              onClick={() => onChange(`${hour}:${m}`)}
+              className={`w-full snap-center flex items-center justify-center h-10 text-2xl font-extrabold transition-colors ${
+                m === minute
+                  ? 'bg-secondary text-secondary-foreground rounded-lg'
+                  : 'text-foreground/60'
+              }`}
+            >
+              {m}
+            </button>
+          ))}
+        </div>
+      </div>
+      <p className="text-center text-xl font-extrabold mt-2 text-foreground">{value}</p>
+    </div>
+  );
+};
 
 const AddMedication = () => {
   const navigate = useNavigate();
@@ -13,14 +102,31 @@ const AddMedication = () => {
     frequency: 'Günde 1 kez',
     stock: '',
   });
+  const [times, setTimes] = useState<string[]>(DEFAULT_TIMES['Günde 1 kez']);
+  const [activeTimeIndex, setActiveTimeIndex] = useState(0);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [sending, setSending] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
 
+  const timeCount = useMemo(() => FREQUENCY_MAP[form.frequency] || 1, [form.frequency]);
+
   const handleChange = (field: string, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
+    if (field === 'frequency') {
+      const defaults = DEFAULT_TIMES[value] || ['08:00'];
+      setTimes(defaults);
+      setActiveTimeIndex(0);
+    }
+  };
+
+  const handleTimeChange = (index: number, value: string) => {
+    setTimes((prev) => {
+      const next = [...prev];
+      next[index] = value;
+      return next;
+    });
   };
 
   const analyzePhoto = async (file: File) => {
@@ -89,6 +195,7 @@ const AddMedication = () => {
       formData.append('dose', form.dose);
       formData.append('frequency', form.frequency);
       formData.append('stock', form.stock);
+      formData.append('hatirlatma_saatleri', JSON.stringify(times.slice(0, timeCount)));
       if (photoFile) {
         formData.append('photo', photoFile);
       }
@@ -205,6 +312,26 @@ const AddMedication = () => {
             <option>Günde 3 kez</option>
             <option>Haftada 1 kez</option>
           </select>
+        </div>
+
+        {/* Hatırlatma Saatleri */}
+        <div>
+          <label className="flex items-center gap-2 font-bold text-lg mb-3">
+            <Clock size={22} className="text-nav-orange" />
+            İlaç Saatleri
+          </label>
+          <div className={`grid gap-3 ${timeCount === 1 ? 'grid-cols-1' : timeCount === 2 ? 'grid-cols-2' : 'grid-cols-3'}`}>
+            {times.slice(0, timeCount).map((t, i) => (
+              <TimePicker
+                key={i}
+                value={t}
+                onChange={(v) => handleTimeChange(i, v)}
+                label={`${i + 1}. Doz`}
+                active={activeTimeIndex === i}
+                onFocus={() => setActiveTimeIndex(i)}
+              />
+            ))}
+          </div>
         </div>
 
         <div>
