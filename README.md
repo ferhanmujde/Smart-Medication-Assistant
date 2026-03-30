@@ -25,7 +25,7 @@ Smart Medication Assistant, Türkiye'deki yaşlı kullanıcılar için sıfırda
 
 🔗 Yayın Linki: https://smart-medication-assistant.lovable.app
 
-🎥 Demo Video: <!-- BURAYA LOOM VİDEO LİNKİNİZİ YAPIŞTIRINIZ -->
+🎥 Demo Video: https://www.loom.com/share/2c7c43cf642d461eaef54bc2c17f8e76
 
 ---
 
