@@ -373,6 +373,45 @@ const AddMedication = () => {
           {sending ? '⏳ Gönderiliyor...' : '💾 Kaydet'}
         </button>
       </form>
+
+      {/* Onay Penceresi */}
+      <AlertDialog open={!!pendingAnalysis} onOpenChange={(open) => !open && setPendingAnalysis(null)}>
+        <AlertDialogContent className="max-w-md mx-auto p-8">
+          <AlertDialogHeader className="space-y-4">
+            <AlertDialogTitle className="text-3xl font-extrabold text-center">
+              🔍 Okunan İlaç
+            </AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="text-center space-y-3">
+                <p className="text-4xl font-extrabold text-foreground">
+                  {pendingAnalysis?.name || '—'}
+                </p>
+                <p className="text-2xl font-bold text-muted-foreground">
+                  Dozaj: {pendingAnalysis?.dose || '—'}
+                </p>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex flex-col gap-4 mt-6 sm:flex-col">
+            <button
+              type="button"
+              onClick={handleConfirmAnalysis}
+              className="w-full min-h-[72px] rounded-xl text-2xl font-extrabold text-white shadow-lg active:opacity-80 transition-opacity"
+              style={{ backgroundColor: 'hsl(142, 71%, 45%)' }}
+            >
+              ✅ DOĞRU
+            </button>
+            <button
+              type="button"
+              onClick={handleRejectAnalysis}
+              className="w-full min-h-[72px] rounded-xl text-2xl font-extrabold text-white shadow-lg active:opacity-80 transition-opacity"
+              style={{ backgroundColor: 'hsl(0, 84%, 60%)' }}
+            >
+              ❌ YANLIŞ, ELLE DÜZELT
+            </button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
