@@ -2,6 +2,14 @@ import { useNavigate } from 'react-router-dom';
 import { useState, useRef, useMemo } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Clock } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+} from '@/components/ui/alert-dialog';
 
 const WEBHOOK_URL = 'https://hook.eu1.make.com/cv53gsneecdp9ggkapnyjj8d1fp9wa8j';
 
