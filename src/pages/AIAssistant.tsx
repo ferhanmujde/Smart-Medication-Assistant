@@ -36,11 +36,13 @@ const AIAssistant = () => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  const DISCLAIMER = '\n\n⚕️ Bu bir tıbbi tavsiye değildir, doktorunuza danışın.';
+
   const sendMessage = (text: string) => {
     if (!text.trim()) return;
     const userMsg: Message = { role: 'user', text };
-    const aiText = aiResponses[text] || 'Bu konuda doktorunuza danışmanızı öneririm. Size genel bilgi verebilirim ama her durumda uzman görüşü önemlidir. 🩺';
-    const aiMsg: Message = { role: 'ai', text: aiText };
+    const rawResponse = aiResponses[text] || 'Bu konuda doktorunuza danışmanızı öneririm. Size genel bilgi verebilirim ama her durumda uzman görüşü önemlidir. 🩺';
+    const aiMsg: Message = { role: 'ai', text: rawResponse + DISCLAIMER };
     setMessages((prev) => [...prev, userMsg, aiMsg]);
     setInput('');
   };
