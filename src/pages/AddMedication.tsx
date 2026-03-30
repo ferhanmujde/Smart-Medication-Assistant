@@ -117,6 +117,7 @@ const AddMedication = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [sending, setSending] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
+  const [pendingAnalysis, setPendingAnalysis] = useState<{ name: string; dose: string } | null>(null);
 
   const timeCount = useMemo(() => FREQUENCY_MAP[form.frequency] || 1, [form.frequency]);
 
