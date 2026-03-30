@@ -166,12 +166,6 @@ const AddMedication = () => {
           variant: 'destructive',
         });
       }
-        toast({
-          title: '⚠️ Analiz başarısız',
-          description: 'Bilgileri manuel olarak girebilirsiniz.',
-          variant: 'destructive',
-        });
-      }
     } catch {
       toast({
         title: '❌ Bağlantı hatası',
@@ -181,6 +175,23 @@ const AddMedication = () => {
     } finally {
       setAnalyzing(false);
     }
+  };
+
+  const handleConfirmAnalysis = () => {
+    if (pendingAnalysis) {
+      setForm((prev) => ({
+        ...prev,
+        name: pendingAnalysis.name,
+        dose: pendingAnalysis.dose,
+      }));
+      toast({ title: '✅ Bilgiler onaylandı' });
+      setPendingAnalysis(null);
+    }
+  };
+
+  const handleRejectAnalysis = () => {
+    setPendingAnalysis(null);
+    toast({ title: '✏️ Bilgileri kendiniz girebilirsiniz' });
   };
 
   const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
