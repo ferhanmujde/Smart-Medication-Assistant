@@ -2,6 +2,14 @@ import { useNavigate } from 'react-router-dom';
 import { useState, useRef, useMemo } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Clock } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+} from '@/components/ui/alert-dialog';
 
 const WEBHOOK_URL = 'https://hook.eu1.make.com/cv53gsneecdp9ggkapnyjj8d1fp9wa8j';
 
@@ -109,6 +117,7 @@ const AddMedication = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [sending, setSending] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
+  const [pendingAnalysis, setPendingAnalysis] = useState<{ name: string; dose: string } | null>(null);
 
   const timeCount = useMemo(() => FREQUENCY_MAP[form.frequency] || 1, [form.frequency]);
 
@@ -147,15 +156,9 @@ const AddMedication = () => {
 
       if (response.ok) {
         const data = await response.json();
-        setForm((prev) => ({
-          ...prev,
-          name: data.name || data.ilac_adi || prev.name,
-          dose: data.dose || data.dozaj || prev.dose,
-        }));
-        toast({
-          title: '✅ Analiz tamamlandı',
-          description: 'İlaç bilgileri otomatik dolduruldu. Kontrol edip kaydedin.',
-        });
+        const analyzedName = data.name || data.ilac_adi || '';
+        const analyzedDose = data.dose || data.dozaj || '';
+        setPendingAnalysis({ name: analyzedName, dose: analyzedDose });
       } else {
         toast({
           title: '⚠️ Analiz başarısız',
@@ -172,6 +175,23 @@ const AddMedication = () => {
     } finally {
       setAnalyzing(false);
     }
+  };
+
+  const handleConfirmAnalysis = () => {
+    if (pendingAnalysis) {
+      setForm((prev) => ({
+        ...prev,
+        name: pendingAnalysis.name,
+        dose: pendingAnalysis.dose,
+      }));
+      toast({ title: '✅ Bilgiler onaylandı' });
+      setPendingAnalysis(null);
+    }
+  };
+
+  const handleRejectAnalysis = () => {
+    setPendingAnalysis(null);
+    toast({ title: '✏️ Bilgileri kendiniz girebilirsiniz' });
   };
 
   const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -353,6 +373,45 @@ const AddMedication = () => {
           {sending ? '⏳ Gönderiliyor...' : '💾 Kaydet'}
         </button>
       </form>
+
+      {/* Onay Penceresi */}
+      <AlertDialog open={!!pendingAnalysis} onOpenChange={(open) => !open && setPendingAnalysis(null)}>
+        <AlertDialogContent className="max-w-md mx-auto p-8">
+          <AlertDialogHeader className="space-y-4">
+            <AlertDialogTitle className="text-3xl font-extrabold text-center">
+              🔍 Okunan İlaç
+            </AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="text-center space-y-3">
+                <p className="text-4xl font-extrabold text-foreground">
+                  {pendingAnalysis?.name || '—'}
+                </p>
+                <p className="text-2xl font-bold text-muted-foreground">
+                  Dozaj: {pendingAnalysis?.dose || '—'}
+                </p>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex flex-col gap-4 mt-6 sm:flex-col">
+            <button
+              type="button"
+              onClick={handleConfirmAnalysis}
+              className="w-full min-h-[72px] rounded-xl text-2xl font-extrabold text-white shadow-lg active:opacity-80 transition-opacity"
+              style={{ backgroundColor: 'hsl(142, 71%, 45%)' }}
+            >
+              ✅ DOĞRU
+            </button>
+            <button
+              type="button"
+              onClick={handleRejectAnalysis}
+              className="w-full min-h-[72px] rounded-xl text-2xl font-extrabold text-white shadow-lg active:opacity-80 transition-opacity"
+              style={{ backgroundColor: 'hsl(0, 84%, 60%)' }}
+            >
+              ❌ YANLIŞ, ELLE DÜZELT
+            </button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
