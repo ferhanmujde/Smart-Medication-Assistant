@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { mockMedications, getTodayDoses } from '@/data/medications';
 import { toast } from 'sonner';
+import { useOnlineStatus } from '@/hooks/use-online-status';
 
 const Home = () => {
   const navigate = useNavigate();
