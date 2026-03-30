@@ -24,6 +24,13 @@ const Home = () => {
   });
 
   const handleTakeMedication = () => {
+    if (!isOnline) {
+      savePendingTake();
+      setTaken(true);
+      setShowTakeButton(false);
+      toast.info('📡 İnternet yok — kayıt yerel olarak saklandı. Bağlantı gelince otomatik gönderilecek.');
+      return;
+    }
     setTaken(true);
     setShowTakeButton(false);
     toast.success('✅ İlacınız kaydedildi! Aile üyeleriniz bilgilendirildi.');
