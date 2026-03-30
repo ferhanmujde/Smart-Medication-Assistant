@@ -2,9 +2,11 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { mockMedications, getTodayDoses } from '@/data/medications';
 import { toast } from 'sonner';
+import { useOnlineStatus } from '@/hooks/use-online-status';
 
 const Home = () => {
   const navigate = useNavigate();
+  const { isOnline, savePendingTake } = useOnlineStatus();
   const todayDoses = getTodayDoses(mockMedications);
   const [showTakeButton, setShowTakeButton] = useState(false);
   const [taken, setTaken] = useState(false);
@@ -22,6 +24,13 @@ const Home = () => {
   });
 
   const handleTakeMedication = () => {
+    if (!isOnline) {
+      savePendingTake();
+      setTaken(true);
+      setShowTakeButton(false);
+      toast.info('📡 İnternet yok — kayıt yerel olarak saklandı. Bağlantı gelince otomatik gönderilecek.');
+      return;
+    }
     setTaken(true);
     setShowTakeButton(false);
     toast.success('✅ İlacınız kaydedildi! Aile üyeleriniz bilgilendirildi.');
@@ -64,10 +73,14 @@ const Home = () => {
       {showTakeButton && !taken && (
         <button
           onClick={handleTakeMedication}
-          className="w-full bg-primary text-primary-foreground font-extrabold text-2xl rounded-xl py-6 min-h-[72px] mb-6 shadow-lg active:scale-95 transition-transform animate-pulse"
-          style={{ animation: 'pulse 2s infinite' }}
+          className={`w-full font-extrabold text-2xl rounded-xl py-6 min-h-[72px] mb-6 shadow-lg transition-transform ${
+            isOnline
+              ? 'bg-primary text-primary-foreground active:scale-95 animate-pulse'
+              : 'bg-muted text-muted-foreground cursor-default'
+          }`}
+          style={isOnline ? { animation: 'pulse 2s infinite' } : undefined}
         >
-          ✅ İlacı İçtim
+          {isOnline ? '✅ İlacı İçtim' : '📡 İnternet Yok — Yine de Kaydet'}
         </button>
       )}
 
