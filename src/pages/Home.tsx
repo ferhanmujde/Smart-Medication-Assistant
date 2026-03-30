@@ -6,6 +6,7 @@ import { useOnlineStatus } from '@/hooks/use-online-status';
 
 const Home = () => {
   const navigate = useNavigate();
+  const { isOnline, savePendingTake } = useOnlineStatus();
   const todayDoses = getTodayDoses(mockMedications);
   const [showTakeButton, setShowTakeButton] = useState(false);
   const [taken, setTaken] = useState(false);
