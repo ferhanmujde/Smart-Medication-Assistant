@@ -23,7 +23,7 @@ Smart Medication Assistant, Türkiye'deki yaşlı kullanıcılar için sıfırda
 
 ## Canlı Demo
 
-🔗 Yayın Linki: https://ilacim-yanimda-dost.lovable.app
+🔗 Yayın Linki: https://smart-medication-assistant.lovable.app
 
 🎥 Demo Video: <!-- BURAYA LOOM VİDEO LİNKİNİZİ YAPIŞTIRINIZ -->
 
