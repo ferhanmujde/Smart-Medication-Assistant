@@ -113,106 +113,108 @@ const Home = () => {
   }, [clearUndoTimers]);
 
   const navButtons = [
-    { label: '📷 İlaç Ekle', path: '/add', color: 'bg-nav-green' },
-    { label: '💊 Tüm İlaçlarım', path: '/medications', color: 'bg-nav-blue' },
-    { label: '👨‍👩‍👧 Aile Görünümü', path: '/family', color: 'bg-nav-purple' },
+    { label: '📷 İlaç Ekle', path: '/add', color: 'bg-nav-orange' },
+    { label: '📋 Tüm İlaçlarım', path: '/medications', color: 'bg-nav-blue' },
+    { label: '👨‍👩‍👧 Aile Görünümü', path: '/family', color: 'bg-nav-blue' },
   ];
 
   return (
-    <div className="min-h-screen bg-background p-4 pb-28 max-w-lg mx-auto">
+    <div className="min-h-screen bg-background p-5 pb-28 max-w-lg mx-auto">
       {/* Offline banner */}
       {!isOnline && (
-        <div className="bg-destructive/10 border border-destructive rounded-lg p-3 mb-4 text-center">
-          <p className="text-lg font-bold text-destructive">📡 İnternet Bağlantısı Yok</p>
-          <p className="text-sm text-destructive/80">Verileriniz yerel olarak saklanacak</p>
+        <div className="bg-destructive/10 border-2 border-destructive rounded-xl p-4 mb-5 text-center">
+          <p className="text-xl font-extrabold text-destructive">📡 İnternet Bağlantısı Yok</p>
+          <p className="text-base text-destructive/80 font-bold">Verileriniz yerel olarak saklanacak</p>
         </div>
       )}
 
       {/* Header */}
-      <header className="text-center mb-6">
-        <h1 className="text-3xl font-extrabold">💊 İlaç Asistanınız</h1>
-        <p className="text-xl text-muted-foreground mt-1">Günaydın, Ayşe Teyze!</p>
+      <header className="text-center mb-8">
+        <h1 className="text-3xl font-extrabold text-foreground">💊 İlaç Asistanınız</h1>
+        <p className="text-xl text-muted-foreground mt-2 font-bold">Günaydın, Ayşe Teyze!</p>
       </header>
 
       {/* Today's medications */}
-      <section className="bg-card rounded-lg border p-4 mb-4 shadow-sm">
-        <h2 className="text-xl font-bold mb-3">📅 Bugünkü İlaçlarınız</h2>
-        <div className="space-y-3">
+      <section className="bg-card rounded-xl border-2 border-border p-5 mb-6 shadow-md">
+        <h2 className="text-2xl font-extrabold mb-4 text-foreground">📅 Bugünkü İlaçlarınız</h2>
+        <div className="space-y-4">
           {todayDoses.map((dose, i) => {
             const stock = stockLevels[dose.medicationId];
             const isLowStock = stock !== undefined && stock <= 5;
             return (
               <div
                 key={i}
-                className={`flex items-center justify-between rounded-lg p-3 ${
-                  isLowStock ? 'bg-destructive/10 border border-destructive/30' : 'bg-muted'
+                className={`flex items-center justify-between rounded-xl p-4 ${
+                  isLowStock ? 'bg-destructive/10 border-2 border-destructive/40' : 'bg-muted'
                 }`}
               >
                 <div>
-                  <p className="font-bold text-lg">{dose.medicationName} {dose.dose}</p>
-                  <p className="text-muted-foreground">🕐 {dose.time}</p>
+                  <p className="font-extrabold text-xl text-foreground">{dose.medicationName} {dose.dose}</p>
+                  <p className="text-muted-foreground font-bold text-lg">🕐 {dose.time}</p>
                   {isLowStock && (
-                    <p className="text-destructive font-bold text-sm animate-pulse mt-1">
+                    <p className="text-destructive font-extrabold text-base animate-pulse mt-1">
                       ⚠️ Stok: {stock} — Bitmek üzere!
                     </p>
                   )}
                 </div>
-                <span className="text-2xl">{dose.taken || taken ? '✅' : '⏳'}</span>
+                <span className="text-3xl">{dose.taken || taken ? '✅' : '⏳'}</span>
               </div>
             );
           })}
         </div>
       </section>
 
-      {/* Undo bar — shown for 5 seconds after pressing İlacı İçtim */}
+      {/* Undo bar */}
       {undoActive && (
-        <div className="mb-6 space-y-2">
+        <div className="mb-8 space-y-3">
           <button
             onClick={handleUndo}
-            className="w-full bg-destructive text-destructive-foreground font-extrabold text-2xl rounded-xl py-6 min-h-[72px] shadow-lg active:scale-95 transition-transform"
+            className="w-full bg-destructive text-destructive-foreground font-extrabold text-2xl rounded-xl py-7 min-h-[80px] shadow-xl active:scale-95 transition-transform flex items-center justify-center gap-3"
           >
             ❌ İPTAL ET (GERİ AL)
           </button>
-          <Progress value={undoProgress} className="h-3 rounded-full" />
-          <p className="text-center text-muted-foreground font-bold text-base">
+          <Progress value={undoProgress} className="h-4 rounded-full" />
+          <p className="text-center text-muted-foreground font-extrabold text-lg">
             ⏳ {Math.ceil((undoProgress / 100) * 5)} saniye içinde otomatik kaydedilecek...
           </p>
         </div>
       )}
 
-      {/* "İlacı İçtim" CTA — visible only after voice alert */}
+      {/* "İlacı İçtim" CTA — massive, 25%+ of screen */}
       {showTakeButton && !taken && !undoActive && (
         <button
           onClick={handleTakeMedication}
-          className="w-full bg-primary text-primary-foreground font-extrabold text-2xl rounded-xl py-6 min-h-[72px] mb-6 shadow-lg active:scale-95 transition-transform animate-pulse"
-          style={{ animation: 'pulse 2s infinite' }}
+          className="w-full bg-primary text-primary-foreground font-extrabold text-3xl rounded-2xl py-10 min-h-[25vh] mb-8 shadow-2xl active:scale-95 transition-transform flex items-center justify-center gap-4 animate-pulse"
         >
-          {isOnline ? '✅ İlacı İçtim' : '📡 İlacı İçtim (Çevrimdışı)'}
+          💊 {isOnline ? 'İlacı İçtim' : 'İlacı İçtim (Çevrimdışı)'}
         </button>
       )}
 
       {/* Navigation buttons */}
-      <nav className="space-y-3 mb-6">
+      <nav className="space-y-5 mb-8">
         {navButtons.map((btn) => (
           <button
             key={btn.label}
             onClick={() => navigate(btn.path)}
-            className={`w-full ${btn.color} text-primary-foreground font-bold text-xl rounded-lg py-4 min-h-[56px] active:opacity-80 transition-opacity shadow-md`}
+            className={`w-full ${btn.color} text-white font-extrabold text-xl rounded-xl py-5 min-h-[64px] active:scale-95 transition-transform shadow-lg flex items-center justify-center gap-3`}
           >
             {btn.label}
           </button>
         ))}
       </nav>
 
-      {/* Warning */}
-      <p className="text-center text-muted-foreground text-base">
-        ⚠️ Bu uygulama tıbbi tavsiye yerine geçmez.
-      </p>
+      {/* Warning — separate area */}
+      <div className="bg-muted rounded-xl p-4 border border-border">
+        <p className="text-center text-muted-foreground text-base font-bold">
+          ⚠️ Bu uygulama tıbbi tavsiye yerine geçmez.
+        </p>
+      </div>
 
       {/* AI Assistant FAB */}
       <button
         onClick={() => navigate('/assistant')}
-        className="fixed bottom-6 right-6 w-16 h-16 rounded-full bg-nav-orange text-primary-foreground shadow-xl flex items-center justify-center text-3xl active:scale-90 transition-transform z-50"
+        className="fixed bottom-6 right-6 w-18 h-18 rounded-full bg-nav-orange text-white shadow-2xl flex items-center justify-center text-3xl active:scale-90 transition-transform z-50"
+        style={{ width: 72, height: 72 }}
         aria-label="AI Asistan"
       >
         🤖
