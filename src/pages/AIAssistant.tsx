@@ -13,6 +13,7 @@ const quickQuestions = [
   '😴 Uyku yapar mı?',
   '🍺 Alkol olur mu?',
   '💊 Dozu atladım',
+  '⏰ Ne zaman içmeliyim?',
 ];
 
 const aiResponses: Record<string, string> = {
@@ -22,6 +23,7 @@ const aiResponses: Record<string, string> = {
   '😴 Uyku yapar mı?': 'Beloc uyku hali yapabilir. Araç kullanırken dikkatli olun. Diğer ilaçlarınızın belirgin bir uyku etkisi yoktur.',
   '🍺 Alkol olur mu?': 'Coumadin kullanırken alkol kesinlikle önerilmez. Kanama riskini artırır. Diğer ilaçlarla da alkol tüketimini minimumda tutmanız önerilir.',
   '💊 Dozu atladım': 'Atladığınız dozu hatırladığınızda hemen alın. Bir sonraki doz zamanına yakınsa, atlanan dozu atlayın. Asla çift doz almayın!',
+  '⏰ Ne zaman içmeliyim?': 'Beloc sabah 08:00\'de, Coumadin akşam 20:00\'de, Glucophage sabah 08:00 ve akşam 20:00\'de alınmalıdır. Her gün aynı saatte almaya özen gösterin.',
 };
 
 const AIAssistant = () => {
@@ -57,7 +59,7 @@ const AIAssistant = () => {
         >
           ← Geri
         </button>
-        <h1 className="text-2xl font-extrabold">💬 AI Asistanım</h1>
+        <h1 className="text-2xl font-extrabold">🤖 AI Asistanım</h1>
       </div>
 
       {/* Messages */}
@@ -78,17 +80,20 @@ const AIAssistant = () => {
         <div ref={bottomRef} />
       </div>
 
-      {/* Quick questions */}
-      <div className="px-4 py-2 flex flex-wrap gap-2">
-        {quickQuestions.map((q) => (
-          <button
-            key={q}
-            onClick={() => sendMessage(q)}
-            className="bg-muted text-foreground font-semibold px-3 py-2 rounded-full text-base active:bg-border transition-colors"
-          >
-            {q}
-          </button>
-        ))}
+      {/* Quick questions — large buttons above input */}
+      <div className="px-4 py-3 border-t border-border bg-muted/50">
+        <p className="text-sm font-bold text-muted-foreground mb-2">Hızlı Sorular:</p>
+        <div className="flex flex-wrap gap-2">
+          {quickQuestions.map((q) => (
+            <button
+              key={q}
+              onClick={() => sendMessage(q)}
+              className="bg-card text-foreground font-bold px-4 py-3 rounded-2xl text-base min-h-[48px] border border-border shadow-sm active:scale-95 transition-transform"
+            >
+              {q}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Input */}
@@ -100,16 +105,16 @@ const AIAssistant = () => {
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && sendMessage(input)}
             placeholder="Sorunuzu yazın..."
-            className="flex-1 border rounded-lg p-3 text-lg bg-background min-h-[56px] focus:outline-none focus:ring-2 focus:ring-ring"
+            className="flex-1 border rounded-xl p-3 text-lg bg-background min-h-[56px] focus:outline-none focus:ring-2 focus:ring-ring"
           />
         </div>
         <div className="flex gap-2 mt-2">
-          <button className="flex-1 bg-muted text-foreground font-bold text-lg rounded-lg min-h-[56px] active:bg-border transition-colors">
+          <button className="flex-1 bg-muted text-foreground font-bold text-lg rounded-xl min-h-[56px] active:bg-border transition-colors">
             🎤 Sesli Sor
           </button>
           <button
             onClick={() => sendMessage(input)}
-            className="flex-1 bg-nav-orange text-primary-foreground font-bold text-lg rounded-lg min-h-[56px] active:opacity-80 transition-opacity"
+            className="flex-1 bg-nav-orange text-primary-foreground font-bold text-lg rounded-xl min-h-[56px] active:opacity-80 transition-opacity"
           >
             Gönder ➤
           </button>
