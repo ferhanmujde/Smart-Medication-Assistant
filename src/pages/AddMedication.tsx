@@ -156,16 +156,16 @@ const AddMedication = () => {
 
       if (response.ok) {
         const data = await response.json();
-        setForm((prev) => ({
-          ...prev,
-          name: data.name || data.ilac_adi || prev.name,
-          dose: data.dose || data.dozaj || prev.dose,
-        }));
-        toast({
-          title: '✅ Analiz tamamlandı',
-          description: 'İlaç bilgileri otomatik dolduruldu. Kontrol edip kaydedin.',
-        });
+        const analyzedName = data.name || data.ilac_adi || '';
+        const analyzedDose = data.dose || data.dozaj || '';
+        setPendingAnalysis({ name: analyzedName, dose: analyzedDose });
       } else {
+        toast({
+          title: '⚠️ Analiz başarısız',
+          description: 'Bilgileri manuel olarak girebilirsiniz.',
+          variant: 'destructive',
+        });
+      }
         toast({
           title: '⚠️ Analiz başarısız',
           description: 'Bilgileri manuel olarak girebilirsiniz.',
