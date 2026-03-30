@@ -73,10 +73,14 @@ const Home = () => {
       {showTakeButton && !taken && (
         <button
           onClick={handleTakeMedication}
-          className="w-full bg-primary text-primary-foreground font-extrabold text-2xl rounded-xl py-6 min-h-[72px] mb-6 shadow-lg active:scale-95 transition-transform animate-pulse"
-          style={{ animation: 'pulse 2s infinite' }}
+          className={`w-full font-extrabold text-2xl rounded-xl py-6 min-h-[72px] mb-6 shadow-lg transition-transform ${
+            isOnline
+              ? 'bg-primary text-primary-foreground active:scale-95 animate-pulse'
+              : 'bg-muted text-muted-foreground cursor-default'
+          }`}
+          style={isOnline ? { animation: 'pulse 2s infinite' } : undefined}
         >
-          ✅ İlacı İçtim
+          {isOnline ? '✅ İlacı İçtim' : '📡 İnternet Yok — Yine de Kaydet'}
         </button>
       )}
 
